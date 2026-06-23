@@ -210,33 +210,24 @@ export function mergeRepoWorktreeGroups(
     return [...byId.values()]
   }
 
-  // Fold every main-checkout lane into one home lane (when the live branch is
-  // known); reconcile the linked worktrees. Without a probe, main lanes pass
-  // through untouched (remote backend).
-  let homeLane: SidebarSessionGroup | null = null
-  const reconciled: SidebarSessionGroup[] = []
+  // Fold every main-checkout lane into one home lane labeled by the live branch
+  // (the root dir is only ever on one branch); reconcile the linked worktrees.
+  // Always shown, even with no sessions on the current branch yet. Remote
+  // backends (no probe → no homeBranch) keep their main lanes untouched.
+  const mainGroups = repo.groups.filter(group => group.isMain)
+  const reconciled = repo.groups.filter(group => !group.isMain).map(reconcile)
 
-  for (const group of repo.groups) {
-    if (homeBranch && group.isMain) {
-      if (homeLane) {
-        homeLane.sessions = dedupeById([...homeLane.sessions, ...group.sessions])
-      } else {
-        homeLane = { ...group, id: branchLaneId(repo.id, homeBranch), label: homeBranch, path: repo.path, isMain: true, isHome: true, sessions: [...group.sessions] }
-      }
-
-      continue
-    }
-
-    reconciled.push(reconcile(group))
-  }
-
-  // The home checkout always shows, even with no sessions on the current branch yet.
-  if (homeBranch && !homeLane) {
-    homeLane = { id: branchLaneId(repo.id, homeBranch), label: homeBranch, path: repo.path, isMain: true, isHome: true, sessions: [] }
-  }
-
-  if (homeLane) {
-    reconciled.push(homeLane)
+  if (homeBranch) {
+    reconciled.push({
+      id: branchLaneId(repo.id, homeBranch),
+      label: homeBranch,
+      path: repo.path,
+      isMain: true,
+      isHome: true,
+      sessions: dedupeById(mainGroups.flatMap(group => group.sessions))
+    })
+  } else {
+    reconciled.push(...mainGroups)
   }
 
   // Collapse any duplicate a re-anchor produced (a stale lane re-pointed onto a
