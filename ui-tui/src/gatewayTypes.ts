@@ -168,6 +168,8 @@ export interface SubscriptionStateResponse {
     pending_downgrade_tier_name: string | null
     pending_downgrade_at: string | null
     is_past_due: boolean          // dunning: active=false but period live (WS1 M1 footgun)
+    cancel_at_period_end: boolean // subscription scheduled to cancel at period end
+    cancellation_effective_at: string | null  // ISO when cancellation takes effect
   } | null
   tiers: SubscriptionTierOption[]
   portal_url: string | null

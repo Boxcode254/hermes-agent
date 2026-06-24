@@ -58,6 +58,8 @@ class CurrentSubscription:
     pending_downgrade_tier_name: Optional[str] = None
     pending_downgrade_at: Optional[str] = None  # ISO
     is_past_due: bool = False
+    cancel_at_period_end: bool = False
+    cancellation_effective_at: Optional[str] = None  # ISO
 
 
 @dataclass(frozen=True)
@@ -123,6 +125,8 @@ def _parse_current(raw: Any) -> Optional[CurrentSubscription]:
         pending_downgrade_tier_name=raw.get("pendingDowngradeTierName"),
         pending_downgrade_at=raw.get("pendingDowngradeAt"),
         is_past_due=bool(raw.get("isPastDue")),
+        cancel_at_period_end=bool(raw.get("cancelAtPeriodEnd")),
+        cancellation_effective_at=raw.get("cancellationEffectiveAt") or None,
     )
 
 

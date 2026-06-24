@@ -5599,6 +5599,8 @@ def _serialize_subscription_state(state) -> dict:
             "pending_downgrade_tier_name": c.pending_downgrade_tier_name,
             "pending_downgrade_at": c.pending_downgrade_at,
             "is_past_due": c.is_past_due,
+            "cancel_at_period_end": c.cancel_at_period_end,
+            "cancellation_effective_at": c.cancellation_effective_at,
         }
     tiers = []
     for t in state.tiers:

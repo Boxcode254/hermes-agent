@@ -83,13 +83,21 @@ function OverviewScreen({ ctx, onClose, onPatch, s, t }: ScreenProps) {
   const isFree = !c?.tier_id
   const hasPendingDowngrade = !!c?.pending_downgrade_tier_name
   const isPastDue = !!c?.is_past_due
+  const isCancelScheduled = !!c?.cancel_at_period_end
 
+  // Headline precedence: past-due > cancel-scheduled > downgrade-pending > active.
   // Dunning: past due — don't re-offer fresh subscribe; route to manage/portal.
   const dunningNote = isPastDue && c?.cycle_ends_at
     ? `Payment past due — your plan is still active until ${c.cycle_ends_at}.`
     : null
 
-  const downgradeNote = hasPendingDowngrade
+  const cancellationNote = !isPastDue && isCancelScheduled
+    ? c?.cancellation_effective_at
+      ? `Cancels on ${c.cancellation_effective_at} — your plan stays active until then.`
+      : 'Cancellation scheduled — your plan stays active until the end of the billing period.'
+    : null
+
+  const downgradeNote = !isPastDue && !isCancelScheduled && hasPendingDowngrade
     ? `Scheduled to switch to ${c?.pending_downgrade_tier_name} on ${c?.pending_downgrade_at}.`
     : null
 
@@ -187,6 +195,11 @@ function OverviewScreen({ ctx, onClose, onPatch, s, t }: ScreenProps) {
       {dunningNote && (
         <Box marginTop={1}>
           <Text color={t.color.warn}>{dunningNote}</Text>
+        </Box>
+      )}
+      {cancellationNote && (
+        <Box marginTop={1}>
+          <Text color={t.color.warn}>{cancellationNote}</Text>
         </Box>
       )}
       {downgradeNote && (
