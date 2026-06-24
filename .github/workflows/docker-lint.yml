@@ -11,6 +11,7 @@ name: Docker / shell lint
 # activate script doesn't exist at lint time.
 
 on:
+<<<<<<< HEAD
   push:
     branches: [main]
     paths:
@@ -24,6 +25,9 @@ on:
   # when no matching files change, which blocks merge).
   pull_request:
     branches: [main]
+=======
+  workflow_call:
+>>>>>>> origin/main
 
 permissions:
   contents: read

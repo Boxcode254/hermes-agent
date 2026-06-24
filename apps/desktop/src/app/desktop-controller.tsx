@@ -715,7 +715,11 @@ export function DesktopController() {
   // (the "forgets the LLM setting" report). gatewayState stays 'open' across a
   // swap (background sockets persist), so the open→open effect won't re-run.
   const activeGatewayProfile = useStore($activeGatewayProfile)
+<<<<<<< HEAD
   const lastGatewayProfileRef = useRef<string | undefined>(undefined)
+=======
+  const lastGatewayProfileRef = useRef(activeGatewayProfile)
+>>>>>>> origin/main
 
   useEffect(() => {
     if (activeGatewayProfile === lastGatewayProfileRef.current) {

@@ -250,6 +250,10 @@ export interface StatusBarSegments {
   compressions: boolean
   cost: boolean
   duration: boolean
+<<<<<<< HEAD
+=======
+  subagents: boolean
+>>>>>>> origin/main
   voice: boolean
 }
 
@@ -263,6 +267,10 @@ export function statusBarSegments(cols: number): StatusBarSegments {
     compressions: w >= 80,
     voice: w >= 84,
     bg: w >= 88,
+<<<<<<< HEAD
+=======
+    subagents: w >= 92,
+>>>>>>> origin/main
     cost: w >= 96
   }
 }
@@ -512,6 +520,11 @@ export function StatusRule({
   const showVoice = segs.voice && !!voiceLabel && fits(SEP + stringWidth(voiceLabel))
   const showSessionCount = !!sessionCountText && fits(SEP + stringWidth(sessionCountText))
   const showBg = segs.bg && bgCount > 0 && fits(SEP + stringWidth(`${bgCount} bg`))
+<<<<<<< HEAD
+=======
+  const subagentCount = typeof usage.active_subagents === 'number' ? usage.active_subagents : 0
+  const showSubagents = segs.subagents && subagentCount > 0 && fits(SEP + stringWidth(`⛓ ${subagentCount}`))
+>>>>>>> origin/main
   const showCostSeg = segs.cost && showCost && !!costText && fits(SEP + stringWidth(costText))
   // No segs flag / no showCost coupling — it's a server-gated dev readout, lowest priority,
   // so it consumes tail budget LAST and drops first on a narrow terminal.
@@ -619,6 +632,15 @@ export function StatusRule({
             {bgCount} bg
           </Text>
         ) : null}
+<<<<<<< HEAD
+=======
+        {showSubagents ? (
+          <Text color={t.color.muted} wrap="truncate-end">
+            {' │ '}
+            ⛓ {subagentCount}
+          </Text>
+        ) : null}
+>>>>>>> origin/main
         {showCostSeg ? (
           <Text color={t.color.muted} wrap="truncate-end">
             {' │ '}

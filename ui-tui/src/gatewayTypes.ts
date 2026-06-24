@@ -310,6 +310,10 @@ export interface SessionUndoResponse {
 }
 
 export interface SessionUsageResponse {
+<<<<<<< HEAD
+=======
+  active_subagents?: number
+>>>>>>> origin/main
   cache_read?: number
   cache_write?: number
   calls?: number

@@ -1,5 +1,6 @@
 name: Supply Chain Audit
 
+<<<<<<< HEAD
 on:
   # No paths filter — the jobs must always run so required checks
   # report a status (path-gated workflows leave checks "pending" forever
@@ -11,6 +12,8 @@ permissions:
   pull-requests: write
   contents: read
 
+=======
+>>>>>>> origin/main
 # Narrow, high-signal scanner. Only fires on critical indicators of supply
 # chain attacks (e.g. the litellm-style payloads). Low-signal heuristics
 # (plain base64, plain exec/eval, dependency/Dockerfile/workflow edits,
@@ -19,6 +22,7 @@ permissions:
 # the scanner. Keep this file's checks ruthlessly narrow: if you find
 # yourself adding WARNING-tier patterns here again, make a separate
 # advisory-only workflow instead.
+<<<<<<< HEAD
 
 jobs:
   # ── Path filter (shared by both scan and dep-bounds) ───────────────
@@ -69,6 +73,42 @@ jobs:
     name: Scan PR for critical supply chain risks
     needs: changes
     if: needs.changes.outputs.scan == 'true'
+=======
+#
+# Path-gating is handled centrally by the ``ci.yml`` orchestrator's
+# ``detect`` job. The orchestrator passes ``scan`` / ``deps`` /
+# ``mcp_catalog`` booleans as inputs; this workflow's jobs gate on those
+# inputs instead of re-computing the diff.
+
+on:
+  workflow_call:
+    inputs:
+      event_name:
+        description: The event name from the calling orchestrator.
+        type: string
+        required: true
+      scan:
+        description: Whether supply-chain-relevant files changed.
+        type: boolean
+        required: true
+      deps:
+        description: Whether pyproject.toml changed.
+        type: boolean
+        required: true
+      mcp_catalog:
+        description: Whether the MCP catalog / installer changed.
+        type: boolean
+        required: true
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  scan:
+    name: Scan PR for critical supply chain risks
+    if: inputs.scan
+>>>>>>> origin/main
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -111,7 +151,11 @@ jobs:
           fi
 
           # --- base64 decode + exec/eval on the same line (the litellm attack pattern) ---
+<<<<<<< HEAD
           B64_EXEC_HITS=$(echo "$DIFF" | grep -n '^\+' | grep -iE 'base64\.(b64decode|decodebytes|urlsafe_b64decode)' | grep -iE 'exec\(|eval\(' | head -10 || true)
+=======
+          B64_EXEC_HITS=$(echo "$DIFF" | grep -n '^+' | grep -iE 'base64\.(b64decode|decodebytes|urlsafe_b64decode)' | grep -iE 'exec\(|eval\(' | head -10 || true)
+>>>>>>> origin/main
           if [ -n "$B64_EXEC_HITS" ]; then
             FINDINGS="${FINDINGS}
           ### 🚨 CRITICAL: base64 decode + exec/eval combo
@@ -125,7 +169,11 @@ jobs:
           fi
 
           # --- subprocess with encoded/obfuscated command argument ---
+<<<<<<< HEAD
           PROC_HITS=$(echo "$DIFF" | grep -n '^\+' | grep -E 'subprocess\.(Popen|call|run)\s*\(' | grep -iE 'base64|\\x[0-9a-f]{2}|chr\(' | head -10 || true)
+=======
+          PROC_HITS=$(echo "$DIFF" | grep -n '^+' | grep -E 'subprocess\.(Popen|call|run)\s*\(' | grep -iE 'base64|\\x[0-9a-f]{2}|chr\(' | head -10 || true)
+>>>>>>> origin/main
           if [ -n "$PROC_HITS" ]; then
             FINDINGS="${FINDINGS}
           ### 🚨 CRITICAL: subprocess with encoded/obfuscated command
@@ -187,6 +235,7 @@ jobs:
           echo "::error::CRITICAL supply chain risk patterns detected in this PR. See the PR comment for details."
           exit 1
 
+<<<<<<< HEAD
   # Gate: reports success when scan was skipped (no relevant files changed).
   # This ensures the required check always gets a status.
   scan-gate:
@@ -204,6 +253,11 @@ jobs:
     name: Check PyPI dependency upper bounds
     needs: changes
     if: needs.changes.outputs.deps == 'true'
+=======
+  dep-bounds:
+    name: Check PyPI dependency upper bounds
+    if: inputs.deps
+>>>>>>> origin/main
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -253,7 +307,11 @@ jobs:
           $(cat /tmp/unbounded.txt)
           \`\`\`
 
+<<<<<<< HEAD
           **Fix:** Add an upper bound, e.g. \`\"package>=1.2.0,<2\"\`
+=======
+          **Fix:** Add an upper bound, e.g. \`"package>=1.2.0,<2"\`
+>>>>>>> origin/main
 
           ---
           *See PR #2810 and CONTRIBUTING.md for the full policy rationale.*"
@@ -266,6 +324,7 @@ jobs:
           echo "::error::PyPI dependencies without upper bounds detected. Add <next_major ceiling per CONTRIBUTING.md policy."
           exit 1
 
+<<<<<<< HEAD
   # Gate: reports success when dep-bounds was skipped (no pyproject.toml changed).
   # This ensures the required check always gets a status.
   dep-bounds-gate:
@@ -283,6 +342,11 @@ jobs:
     name: MCP catalog security review
     needs: changes
     if: needs.changes.outputs.mcp_catalog == 'true'
+=======
+  mcp-catalog-review:
+    name: MCP catalog security review
+    if: inputs.mcp_catalog
+>>>>>>> origin/main
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -317,6 +381,7 @@ jobs:
           gh pr comment "$PR" --body "$BODY" || echo "::warning::Could not post PR comment (expected for fork PRs)"
           echo "::error::MCP catalog changes require the mcp-catalog-reviewed label."
           exit 1
+<<<<<<< HEAD
 
   mcp-catalog-review-gate:
     name: MCP catalog security review
@@ -325,3 +390,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "No MCP catalog changes, skipping MCP catalog security review."
+=======
+>>>>>>> origin/main

@@ -4,6 +4,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Codicon } from '@/components/ui/codicon'
+<<<<<<< HEAD
+=======
+import { Tip } from '@/components/ui/tooltip'
+>>>>>>> origin/main
 import { useI18n } from '@/i18n'
 import { triggerHaptic } from '@/lib/haptics'
 import { cn } from '@/lib/utils'
@@ -204,6 +208,7 @@ function TitlebarToolButton({ navigate, tool }: { navigate: ReturnType<typeof us
 
   if (tool.href) {
     return (
+<<<<<<< HEAD
       <Button asChild className={className} size="icon-titlebar" variant="ghost">
         <a
           aria-label={tool.label}
@@ -216,10 +221,26 @@ function TitlebarToolButton({ navigate, tool }: { navigate: ReturnType<typeof us
           {tool.icon}
         </a>
       </Button>
+=======
+      <Tip label={tool.title ?? tool.label}>
+        <Button asChild className={className} size="icon-titlebar" variant="ghost">
+          <a
+            aria-label={tool.label}
+            href={tool.href}
+            onPointerDown={event => event.stopPropagation()}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {tool.icon}
+          </a>
+        </Button>
+      </Tip>
+>>>>>>> origin/main
     )
   }
 
   return (
+<<<<<<< HEAD
     <Button
       aria-label={tool.label}
       aria-pressed={tool.active ?? undefined}
@@ -240,5 +261,28 @@ function TitlebarToolButton({ navigate, tool }: { navigate: ReturnType<typeof us
     >
       {tool.icon}
     </Button>
+=======
+    <Tip label={tool.title ?? tool.label}>
+      <Button
+        aria-label={tool.label}
+        aria-pressed={tool.active ?? undefined}
+        className={className}
+        disabled={tool.disabled}
+        onClick={() => {
+          if (tool.to) {
+            navigate(tool.to)
+          }
+
+          tool.onSelect?.()
+        }}
+        onPointerDown={event => event.stopPropagation()}
+        size="icon-titlebar"
+        type="button"
+        variant="ghost"
+      >
+        {tool.icon}
+      </Button>
+    </Tip>
+>>>>>>> origin/main
   )
 }

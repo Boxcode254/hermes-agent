@@ -284,6 +284,7 @@ function Resolve-NpmCmd {
 }
 
 function Find-SystemBrowser {
+<<<<<<< HEAD
     $candidates = @(
         "${env:ProgramFiles}\Google\Chrome\Application\chrome.exe",
         "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe",
@@ -296,6 +297,19 @@ function Find-SystemBrowser {
     foreach ($p in $candidates) {
         if (Test-Path $p) { return $p }
     }
+=======
+    # Honor ONLY an explicit, user-set AGENT_BROWSER_EXECUTABLE_PATH override.
+    #
+    # We no longer scan well-known install locations for a system browser.
+    # Auto-detection silently bound the install to an arbitrary binary instead
+    # of the bundled Playwright Chromium, which made the browser tool behave
+    # differently across hosts (and, on Linux, picked up a sandboxed Snap
+    # Chromium that hangs every browser_navigate). Every install now uses the
+    # bundled Chromium unless the user explicitly points elsewhere.
+    $override = $env:AGENT_BROWSER_EXECUTABLE_PATH
+    if ([string]::IsNullOrWhiteSpace($override)) { return $null }
+    if (Test-Path $override) { return $override }
+>>>>>>> origin/main
     return $null
 }
 
@@ -346,7 +360,11 @@ function Install-AgentBrowser {
         $sysBrowser = Find-SystemBrowser
         if ($sysBrowser) {
             Write-BrowserEnv -BrowserPath $sysBrowser
+<<<<<<< HEAD
             Write-Info "System browser detected -- skipping Chromium download"
+=======
+            Write-Info "Explicit browser override set -- skipping bundled Chromium download"
+>>>>>>> origin/main
         } else {
             $abExe = Join-Path $prefixDir "agent-browser.cmd"
             if (Test-Path $abExe) {

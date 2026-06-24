@@ -44,6 +44,7 @@ name: uv.lock check
 # the same way.  Better to catch it here than after merge.
 
 on:
+<<<<<<< HEAD
   push:
     branches: [main]
     paths:
@@ -56,13 +57,20 @@ on:
   # when no matching files change, which blocks merge).
   pull_request:
     branches: [main]
+=======
+  workflow_call:
+>>>>>>> origin/main
 
 permissions:
   contents: read
 
 concurrency:
   group: uv-lockfile-check-${{ github.event.pull_request.number || github.ref }}
+<<<<<<< HEAD
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+=======
+  cancel-in-progress: true
+>>>>>>> origin/main
 
 jobs:
   check:
