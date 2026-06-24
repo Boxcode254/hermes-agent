@@ -5,9 +5,11 @@ import { queryClient } from '@/lib/query-client'
 import {
   arraysEqual,
   persistBoolean,
+  persistString,
   persistStringArray,
   persistStringRecord,
   storedBoolean,
+  storedString,
   storedStringArray,
   storedStringRecord
 } from '@/lib/storage'
@@ -29,9 +31,30 @@ export function normalizeProfileKey(name: string | null | undefined): string {
 // preference (which may be unset) lives in the Electron main process.
 export const $activeProfile = atom<string>('default')
 
-// Cached profile list for the picker. Refreshed lazily; the dropdown also
-// re-fetches on open so a profile created elsewhere shows up.
-export const $profiles = atom<ProfileInfo[]>([])
+// Profile list cache — survives restarts so the rail doesn't render empty
+// while the backend is starting up.
+const PROFILES_STORAGE_KEY = 'hermes.desktop.profiles'
+
+// Cached profile list for the picker. Initialized from localStorage so the
+// sidebar rail renders immediately on boot; refreshed via refreshActiveProfile()
+// when the gateway connects.
+function storedProfiles(): ProfileInfo[] {
+  const raw = storedString(PROFILES_STORAGE_KEY)
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as ProfileInfo[]) : []
+  } catch {
+    return []
+  }
+}
+
+function persistProfiles(value: ProfileInfo[]) {
+  persistString(PROFILES_STORAGE_KEY, value.length > 0 ? JSON.stringify(value) : null)
+}
+
+export const $profiles = atom<ProfileInfo[]>(storedProfiles())
+$profiles.subscribe(value => persistProfiles([...value]))
 
 export function setActiveProfile(name: string): void {
   $activeProfile.set(name || 'default')
